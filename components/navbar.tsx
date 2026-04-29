@@ -6,6 +6,7 @@ const links = [
   { href: '/alerts', label: 'Alerts' },
   { href: '/records', label: 'Records' },
   { href: '/admin', label: 'Admin Demo' },
+  { href: '/ai', label: 'AI Help' },
 ];
 
 export function Navbar() {
