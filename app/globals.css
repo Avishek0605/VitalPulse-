@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-navy text-white antialiased;
+}
+
+.container-shell {
+  @apply mx-auto w-full max-w-6xl px-4;
+}
+
+.panel {
+  @apply rounded-2xl border border-white/10 bg-surface/80 backdrop-blur-md;
+}
