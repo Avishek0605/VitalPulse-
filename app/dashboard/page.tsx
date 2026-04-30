@@ -1,70 +1,12 @@
 'use client';
-
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { isDemoLoggedIn, setDemoLoggedIn } from '@/lib/demo-auth';
 import { useRouter } from 'next/navigation';
-import { ActivitySquare, HeartPulse, Stethoscope, Thermometer } from 'lucide-react';
-import { AppShellHeader } from '@/components/app-shell-header';
-import { isDemoLoggedIn } from '@/lib/demo-auth';
+import { Patient } from '@/lib/types';
 
-const statusMap = {
-  stable: 'text-green-400 border-green-400/40 bg-green-500/10',
-  warning: 'text-yellow-300 border-yellow-400/40 bg-yellow-500/10',
-  critical: 'text-red-300 border-red-400/40 bg-red-500/10',
-};
-
-export default function DashboardPage() {
-  const router = useRouter();
-  const [seconds, setSeconds] = useState(5);
-  const [status, setStatus] = useState<'stable' | 'warning' | 'critical'>('stable');
-
-  useEffect(() => {
-    if (!isDemoLoggedIn()) router.replace('/login');
-    const timer = setInterval(() => setSeconds((prev) => (prev >= 59 ? 0 : prev + 5)), 5000);
-    const statusTimer = setInterval(() => {
-      setStatus((prev) => (prev === 'stable' ? 'warning' : prev === 'warning' ? 'critical' : 'stable'));
-    }, 12000);
-    return () => {
-      clearInterval(timer);
-      clearInterval(statusTimer);
-    };
-  }, [router]);
-
-  return (
-    <div className="space-y-4">
-      <AppShellHeader />
-      <div className="panel rounded-2xl p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-soft">Patient Name</p>
-            <h1 className="text-2xl font-semibold">Demo Patient</h1>
-            <p className="text-sm text-soft">Room: 203B</p>
-          </div>
-          <span className={`rounded-full border px-4 py-2 text-sm font-semibold capitalize ${statusMap[status]}`}>{status}</span>
-        </div>
-      </div>
-
-      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: 'Heart Rate', value: '78 bpm', icon: HeartPulse },
-          { label: 'SpO2', value: '98 %', icon: ActivitySquare },
-          { label: 'BP', value: '120/80', icon: Stethoscope },
-          { label: 'Temperature', value: '98.6°F', icon: Thermometer },
-        ].map((vital) => (
-          <article key={vital.label} className="panel rounded-2xl p-4">
-            <vital.icon className="h-5 w-5 text-teal" />
-            <p className="mt-2 text-sm text-soft">{vital.label}</p>
-            <p className="text-xl font-semibold">{vital.value}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="panel rounded-2xl p-5">
-        <h2 className="font-semibold">AI Summary</h2>
-        <p className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-soft">
-          Patient is stable. No immediate concern.
-        </p>
-        <p className="mt-3 text-xs text-soft">Updated {seconds} seconds ago</p>
-      </section>
-    </div>
-  );
-}
+export default function Dashboard(){const [p,setP]=useState<Patient|null>(null); const r=useRouter();
+const load=()=>fetch('/api/vitals').then(x=>x.json()).then(setP);
+useEffect(()=>{if(!isDemoLoggedIn()) r.replace('/login'); load(); const t=setInterval(load,5000); return ()=>clearInterval(t);},[r]);
+if(!p) return <div>Loading...</div>;
+return <div className='space-y-4'><div className='flex justify-between'><b>VitalPulse</b><div className='flex gap-2'><button>🔔</button><button onClick={()=>{setDemoLoggedIn(false);r.push('/login')}}>Logout</button></div></div><div><h2>Good morning, Priya 👋</h2><p className='text-soft'>Monitoring: Ramesh Kumar · Father</p></div><div className='panel p-4'><p>{p.name} · {p.age} · {p.ward} Bed {p.bed} · {p.doctor}</p><p className='capitalize'>{p.status}</p><p className='text-sm'>LIVE · Updated 5 seconds ago</p></div><div className='grid grid-cols-2 gap-3'>{[['Heart Rate',p.vitals.heartRate+' bpm'],['SpO2',p.vitals.spo2+'%'],['Blood Pressure',`${p.vitals.systolic}/${p.vitals.diastolic}`],['Temperature',p.vitals.temperature+'°F']].map(v=><div key={String(v)} className='panel p-3 border-t-2 border-teal'><p className='text-soft text-sm'>{v[0]}</p><p>{v[1]}</p></div>)}</div><div className='panel p-3'>Respiratory Rate: {p.vitals.respiratoryRate}</div><div className='panel p-3'>VitalPulse AI: Patient is stable. No immediate concern.</div><Link href='/alerts'>View all alerts</Link><div className='fixed bottom-0 left-0 right-0 bg-[#0F2033] p-2 flex justify-around text-sm'><Link href='/dashboard'>Dashboard</Link><Link href='/alerts'>Alerts</Link><Link href='/records'>Records</Link><Link href='/chat'>AI Chat</Link></div><p className='text-xs text-soft pt-16'>Code by Avishek Bag</p></div>}
