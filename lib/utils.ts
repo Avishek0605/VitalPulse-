@@ -1,16 +1,16 @@
 import { clsx } from 'clsx';
-import { Status } from './types';
+import { PatientStatus } from './types';
 
 export const cn = (...inputs: Array<string | boolean | undefined | null>) => clsx(inputs);
 
-export const statusPill = (status: Status) => {
+export const statusPill = (status: PatientStatus) => {
   switch (status) {
-    case 'Stable':
-      return 'bg-stable/20 text-stable border-stable/30';
-    case 'Warning':
-      return 'bg-warning/20 text-warning border-warning/30';
-    case 'Critical':
-      return 'bg-critical/20 text-critical border-critical/30';
+    case 'stable':
+      return 'bg-[#00C48C]/20 text-[#00C48C] border-[#00C48C]/30';
+    case 'warning':
+      return 'bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/30';
+    case 'critical':
+      return 'bg-[#E53E3E]/20 text-[#E53E3E] border-[#E53E3E]/30';
   }
 };
 
