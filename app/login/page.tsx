@@ -1,8 +1,22 @@
 'use client';
+import { Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { setDemoLoggedIn } from '@/lib/demo-auth';
 
-export default function Login(){const r=useRouter(); const [step,setStep]=useState(1); const [abdm,setAbdm]=useState(''); const [otp,setOtp]=useState(['','','','','','']); const [msg,setMsg]=useState(''); const [loading,setLoading]=useState(false);
-const verify=async()=>{setLoading(true); await new Promise(a=>setTimeout(a,1500)); setDemoLoggedIn(true); r.push('/dashboard');};
-return <div className='max-w-md mx-auto panel p-6'><h1 className='text-center text-teal text-2xl font-semibold'>VitalPulse</h1>{step===1?<> <h2 className='mt-4'>Enter your ABDM Health ID</h2><p className='text-soft text-sm'>Your 14-digit health identity number</p><input value={abdm} onChange={e=>setAbdm(e.target.value)} placeholder='12-3456-7890-1234' className='w-full mt-3 rounded p-2 bg-[#0A1628]'/><button onClick={()=>{setStep(2);setMsg('OTP sent to your registered mobile number');}} className='w-full mt-3 bg-teal text-navy rounded p-2'>Send OTP</button></>:<><h2 className='mt-4'>Enter OTP</h2><p className='text-soft text-sm'>6-digit code sent to ••••••7890</p><div className='flex gap-2 mt-3'>{otp.map((d,i)=><input key={i} maxLength={1} value={d} onChange={e=>{const n=[...otp];n[i]=e.target.value;setOtp(n);}} className='w-10 h-10 text-center rounded bg-[#0A1628]' />)}</div><button onClick={verify} className='w-full mt-3 bg-teal text-navy rounded p-2'>{loading?'Verifying...':'Verify & Connect'}</button></>}<p className='text-green-400 text-sm mt-2'>{msg}</p><p className='text-xs text-soft mt-5'>Demo mode: Enter any ABDM ID and any 6-digit OTP</p><p className='text-xs text-soft mt-4'>Code by Avishek Bag</p></div>}
+export default function Login() {
+  const r = useRouter();
+  const [step, setStep] = useState<1|2>(1);
+  const [abdm, setAbdm] = useState('VP-2024-00847');
+  const [otp, setOtp] = useState(['','','','','','']);
+  const [loading, setLoading] = useState(false);
+
+  const verify = async () => { setLoading(true); await new Promise(a=>setTimeout(a,1500)); setDemoLoggedIn(true); r.push('/dashboard'); };
+
+  return <div className='app-phone p-5 min-h-[88vh]'>
+    <div className='grid place-items-center py-5'><div className='grid h-16 w-16 place-items-center rounded-full border border-cyan-400/30 bg-cyan-400/10'><Heart className='text-teal'/></div><h1 className='text-3xl font-bold mt-3'>VitalPulse</h1><p className='text-soft text-sm'>Real-time care. Every family. Every language.</p></div>
+    {step===1 ? <div className='space-y-3'><h2 className='text-xl font-semibold'>Welcome back</h2><p className='text-soft text-sm'>Enter your ABDM Health ID</p><input className='w-full rounded-xl border border-cyan-400/30 bg-[#0a2035] p-3' value={abdm} onChange={e=>setAbdm(e.target.value)} /><button className='w-full rounded-xl bg-teal py-3 font-semibold text-[#05233b]' onClick={()=>setStep(2)}>Send OTP</button></div> : <div className='space-y-3'><h2 className='text-xl font-semibold'>Enter OTP</h2><p className='text-soft text-sm'>6-digit code sent to ••••••7890</p><div className='flex gap-2'>{otp.map((v,i)=><input key={i} maxLength={1} value={v} onChange={e=>{const n=[...otp];n[i]=e.target.value;setOtp(n);}} className='h-12 w-12 rounded-xl border border-cyan-400/30 bg-[#0a2035] text-center text-lg'/>)}</div><button className='w-full rounded-xl bg-teal py-3 font-semibold text-[#05233b]' onClick={()=>void verify()}>{loading?'Connecting...':'Verify & Connect'}</button></div>}
+    <div className='mt-6 text-center text-xs text-soft'>Demo mode: any ABDM ID + any 6-digit OTP</div>
+    <div className='mt-10 text-center text-xs text-soft'>Secured by ABDM · Code by Avishek Bag</div>
+  </div>;
+}
