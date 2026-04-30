@@ -1,33 +1,8 @@
 'use client';
-
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { setDemoLoggedIn } from '@/lib/demo-auth';
 
-export default function LoginPage() {
-  const [patientId, setPatientId] = useState('P001');
-  const router = useRouter();
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    router.push(`/dashboard?patientId=${patientId}`);
-  };
-
-  return (
-    <div className="mx-auto max-w-md panel p-6">
-      <h1 className="text-2xl font-semibold">Family Login</h1>
-      <p className="mt-2 text-sm text-soft">Enter patient ID / ABHA reference for demo access.</p>
-      <form onSubmit={submit} className="mt-6 space-y-4">
-        <input
-          value={patientId}
-          onChange={(e) => setPatientId(e.target.value)}
-          className="w-full rounded-xl border border-white/20 bg-navy px-4 py-3 outline-none ring-teal focus:ring-2"
-          placeholder="Patient ID"
-          required
-        />
-        <button className="w-full rounded-xl bg-teal px-4 py-3 font-medium text-navy" type="submit">
-          OTP / Demo Access
-        </button>
-      </form>
-    </div>
-  );
-}
+export default function Login(){const r=useRouter(); const [step,setStep]=useState(1); const [abdm,setAbdm]=useState(''); const [otp,setOtp]=useState(['','','','','','']); const [msg,setMsg]=useState(''); const [loading,setLoading]=useState(false);
+const verify=async()=>{setLoading(true); await new Promise(a=>setTimeout(a,1500)); setDemoLoggedIn(true); r.push('/dashboard');};
+return <div className='max-w-md mx-auto panel p-6'><h1 className='text-center text-teal text-2xl font-semibold'>VitalPulse</h1>{step===1?<> <h2 className='mt-4'>Enter your ABDM Health ID</h2><p className='text-soft text-sm'>Your 14-digit health identity number</p><input value={abdm} onChange={e=>setAbdm(e.target.value)} placeholder='12-3456-7890-1234' className='w-full mt-3 rounded p-2 bg-[#0A1628]'/><button onClick={()=>{setStep(2);setMsg('OTP sent to your registered mobile number');}} className='w-full mt-3 bg-teal text-navy rounded p-2'>Send OTP</button></>:<><h2 className='mt-4'>Enter OTP</h2><p className='text-soft text-sm'>6-digit code sent to ••••••7890</p><div className='flex gap-2 mt-3'>{otp.map((d,i)=><input key={i} maxLength={1} value={d} onChange={e=>{const n=[...otp];n[i]=e.target.value;setOtp(n);}} className='w-10 h-10 text-center rounded bg-[#0A1628]' />)}</div><button onClick={verify} className='w-full mt-3 bg-teal text-navy rounded p-2'>{loading?'Verifying...':'Verify & Connect'}</button></>}<p className='text-green-400 text-sm mt-2'>{msg}</p><p className='text-xs text-soft mt-5'>Demo mode: Enter any ABDM ID and any 6-digit OTP</p><p className='text-xs text-soft mt-4'>Code by Avishek Bag</p></div>}
