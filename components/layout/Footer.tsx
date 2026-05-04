@@ -1,0 +1,1 @@
+export function Footer(){return <footer className='mt-6 border-t border-white/10 pt-3 text-center text-[11px] text-[#A0AEC0]'>VitalPulse · Healthcare Technology · India<br/>Powered by ABDM · Gemini AI · FHIR Standards<br/>Code by Avishek Bag</footer>}
