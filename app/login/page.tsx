@@ -1,24 +1,29 @@
 'use client';
-import { Heart } from 'lucide-react';
+
+import { Heart, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { setDemoLoggedIn } from '@/lib/demo-auth';
-import Link from 'next/link';
-import { Footer } from '@/components/layout/Footer';
+import { useRef, useState } from 'react';
 
-export default function Login() {
-  const r = useRouter();
-  const [step, setStep] = useState<1|2>(1);
-  const [abdm, setAbdm] = useState('VP-2024-00847');
-  const [otp, setOtp] = useState(['','','','','','']);
+export default function LoginPage() {
+  const router = useRouter();
+  const [step, setStep] = useState<1 | 2>(1);
+  const [abhaId, setAbhaId] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
+  const refs = useRef<Array<HTMLInputElement | null>>([]);
 
-  const verify = async () => { setLoading(true); await new Promise(a=>setTimeout(a,1500)); setDemoLoggedIn(true); r.push('/dashboard'); };
+  const verify = async () => {
+    if (otp.join('').length < 6) return;
+    setLoading(true);
+    localStorage.setItem('vp_auth', 'true');
+    localStorage.setItem('vp_patient_id', 'VP-2024-001');
+    await new Promise((r) => setTimeout(r, 1500));
+    router.push('/dashboard');
+  };
 
-  return <div className='app-phone p-5 min-h-[88vh]'>
-    <div className='grid place-items-center py-5'><div className='grid h-16 w-16 place-items-center rounded-full border border-cyan-400/30 bg-cyan-400/10'><Heart className='text-teal'/></div><h1 className='text-3xl font-bold mt-3'>VitalPulse</h1><p className='text-soft text-sm'>Real-time care. Every family. Every language.</p></div>
-    {step===1 ? <div className='space-y-3'><h2 className='text-xl font-semibold'>Welcome back</h2><p className='text-soft text-sm'>Enter your ABDM Health ID</p><input className='w-full rounded-xl border border-cyan-400/30 bg-[#0a2035] p-3' value={abdm} onChange={e=>setAbdm(e.target.value)} /><button className='w-full rounded-xl bg-teal py-3 font-semibold text-[#05233b]' onClick={()=>setStep(2)}>Send OTP</button></div> : <div className='space-y-3'><h2 className='text-xl font-semibold'>Enter OTP</h2><p className='text-soft text-sm'>6-digit code sent to ••••••7890</p><div className='flex gap-2'>{otp.map((v,i)=><input key={i} maxLength={1} value={v} onChange={e=>{const n=[...otp];n[i]=e.target.value;setOtp(n);}} className='h-12 w-12 rounded-xl border border-cyan-400/30 bg-[#0a2035] text-center text-lg'/>)}</div><button className='w-full rounded-xl bg-teal py-3 font-semibold text-[#05233b]' onClick={()=>void verify()}>{loading?'Connecting...':'Verify & Connect'}</button></div>}
-    <div className='mt-6 text-center text-xs text-soft'>Demo mode: any ABDM ID + any 6-digit OTP</div>
-    <div className='mt-4 text-center text-sm'><Link href='/admin/login' className='text-[#00D4FF]'>Hospital Admin? Login here →</Link></div><Footer />
+  return <div className='mx-auto max-w-md rounded-2xl bg-[#0F2033] p-6 text-white shadow-2xl'>
+    <div className='mb-3 rounded-lg bg-cyan-500/20 p-2 text-sm text-cyan-200'>Use any ABHA ID · OTP: 123456</div>
+    <div className='mb-6 text-center'><Heart className='mx-auto text-cyan-400' /><h1 className='text-2xl font-bold'>VitalPulse</h1></div>
+    {step === 1 ? <div className='space-y-3'><input value={abhaId} onChange={(e) => setAbhaId(e.target.value)} placeholder='12-3456-7890-1234' className='w-full rounded-xl border border-cyan-400/30 bg-[#0A1628] p-3' /><button className='w-full rounded-xl bg-cyan-400 p-3 font-semibold text-black' onClick={() => abhaId && setStep(2)}>Send OTP</button></div> : <div className='space-y-3'><div className='flex gap-2'>{otp.map((d, i) => <input key={i} ref={(el) => { refs.current[i] = el; }} value={d} maxLength={1} onChange={(e) => { const n=[...otp]; n[i]=e.target.value; setOtp(n); if (e.target.value && i<5) refs.current[i+1]?.focus(); }} className='h-12 w-12 rounded-xl border border-cyan-400/30 bg-[#0A1628] text-center text-lg' />)}</div><button onClick={() => void verify()} className='w-full rounded-xl bg-cyan-400 p-3 font-semibold text-black'>{loading ? <span className='inline-flex items-center gap-2'><Loader2 className='h-4 w-4 animate-spin' />Verifying...</span> : 'Verify & Login'}</button></div>}
   </div>;
 }
