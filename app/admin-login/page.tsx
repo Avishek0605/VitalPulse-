@@ -1,0 +1,4 @@
+'use client';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+export default function AdminLogin(){const r=useRouter(); const [id,setId]=useState('');const [pw,setPw]=useState(''); return <div className='panel p-6 max-w-md mx-auto'><h1 className='text-2xl'>Hospital Admin Portal</h1><p className='text-soft'>Charnok Healthcare Institute</p><input className='w-full mt-3 rounded p-2 bg-[#0A1628]' placeholder='Hospital ID' value={id} onChange={e=>setId(e.target.value)}/><input className='w-full mt-2 rounded p-2 bg-[#0A1628]' placeholder='Password' type='password' value={pw} onChange={e=>setPw(e.target.value)}/><button onClick={()=>r.push('/admin')} className='w-full bg-teal text-navy rounded p-2 mt-3'>Login</button><p className='text-xs text-soft mt-3'>Use any credentials for demo</p><p className='text-xs text-soft mt-6'>Code by Avishek Bag</p></div>}

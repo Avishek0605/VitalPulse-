@@ -1,25 +1,14 @@
 import { AlertItem, Patient, RecordItem } from './types';
 
 export const mockPatient: Patient = {
-  id: 'P001',
-  name: 'Rohan Sharma',
-  room: 'Ward B · Bed 12',
-  status: 'Stable',
-  heart_rate: 82,
-  spo2: 98,
-  bp: '122/78',
-  temp: 98.6,
-  updated_at: new Date().toISOString(),
+  id: 'VP-2024-001', name: 'Ramesh Kumar', age: 62, room: 'ICU-4', bed: '7', ward: 'Cardiac ICU', doctor: 'Dr. Anjali Sharma', admitted: '15 January 2024', relation: 'Father', status: 'stable',
+  vitals: { heartRate: 88, spo2: 97, systolic: 124, diastolic: 82, temperature: 98.6, respiratoryRate: 16 }, updatedAt: new Date().toISOString(),
 };
 
 export const mockAlerts: AlertItem[] = [
-  { id: 'A1', patient_id: 'P001', message: 'Oxygen dipped to 93%, now recovering.', severity: 'warning', timestamp: new Date(Date.now() - 1000 * 60 * 10).toISOString() },
-  { id: 'A2', patient_id: 'P001', message: 'Doctor reviewed latest vitals.', severity: 'info', timestamp: new Date(Date.now() - 1000 * 60 * 25).toISOString() },
-  { id: 'A3', patient_id: 'P001', message: 'Medication dose updated as planned.', severity: 'info', timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString() },
+  { id: 'A1', message: 'Oxygen dipped to 93%, now recovering.', severity: 'warning', timestamp: new Date().toISOString(), resolved: false },
 ];
 
 export const mockRecords: RecordItem[] = [
-  { id: 'R1', patient_id: 'P001', title: 'Prescription (placeholder)', file_url: '#' },
-  { id: 'R2', patient_id: 'P001', title: 'Lab Report (placeholder)', file_url: '#' },
-  { id: 'R3', patient_id: 'P001', title: 'Discharge Summary (placeholder)', file_url: '#' },
+  { id: 'R1', title: 'Admission Prescription', date: '15 Jan 2024', doctor: 'Dr. Anjali Sharma', type: 'Prescription' },
 ];

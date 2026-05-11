@@ -1,28 +1,42 @@
-export type Status = 'Stable' | 'Warning' | 'Critical';
+export type PatientStatus = 'stable' | 'warning' | 'critical';
+export type AlertSeverity = 'info' | 'warning' | 'critical';
 
-export interface Patient {
+export type Vitals = {
+  heartRate: number;
+  spo2: number;
+  systolic: number;
+  diastolic: number;
+  temperature: number;
+  respiratoryRate: number;
+};
+
+export type Patient = {
   id: string;
   name: string;
+  age: number;
   room: string;
-  status: Status;
-  heart_rate: number;
-  spo2: number;
-  bp: string;
-  temp: number;
-  updated_at: string;
-}
+  bed: string;
+  ward: string;
+  doctor: string;
+  admitted: string;
+  relation: string;
+  status: PatientStatus;
+  vitals: Vitals;
+  updatedAt: string;
+};
 
-export interface AlertItem {
+export type AlertItem = {
   id: string;
-  patient_id: string;
+  severity: AlertSeverity;
   message: string;
-  severity: 'info' | 'warning' | 'critical';
   timestamp: string;
-}
+  resolved: boolean;
+};
 
-export interface RecordItem {
+export type RecordItem = {
   id: string;
-  patient_id: string;
   title: string;
-  file_url: string;
-}
+  date: string;
+  doctor?: string;
+  type: 'Prescription' | 'Report' | 'Notes' | 'Summary';
+};

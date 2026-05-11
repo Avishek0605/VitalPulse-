@@ -1,0 +1,2 @@
+import { Bell, LogOut, HeartPulse } from 'lucide-react';
+export function TopBar(){return <div className='sticky top-0 z-40 mb-3 flex items-center justify-between rounded-2xl border border-white/10 bg-[#0F2033]/90 p-3 backdrop-blur'><div className='flex items-center gap-2'><HeartPulse className='text-[#00D4FF]' size={18}/><span className='font-semibold'>Ramesh Kumar</span></div><div className='flex gap-2'><Bell size={18}/><LogOut size={18}/></div></div>}
