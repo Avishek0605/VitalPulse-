@@ -1,62 +1,29 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function AdminPage() {
-  const [form, setForm] = useState({ heart_rate: 82, spo2: 98, bp: '122/78', temp: 98.6, status: 'Stable' });
-  const [message, setMessage] = useState('');
+  const [form, setForm] = useState({ heart_rate: 88, spo2: 97, bp_systolic: 124, bp_diastolic: 82, temperature: 98.6, resp_rate: 16, status: 'stable' });
+  const [msg, setMsg] = useState('');
 
-  const update = async (e: FormEvent) => {
-    e.preventDefault();
-    const res = await fetch('/api/patients', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: 'P001', ...form }),
-    });
+  useEffect(() => {
+    void fetch('/api/vitals').then((r) => r.json()).then((d) => setForm((f) => ({ ...f, ...d })));
+  }, []);
 
-    if (res.ok) {
-      setMessage('Vitals updated. Family dashboard will refresh within 5 seconds.');
-      await fetch('/api/alerts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          patient_id: 'P001',
-          severity: form.status === 'Critical' ? 'critical' : form.status === 'Warning' ? 'warning' : 'info',
-          message: `Status changed to ${form.status}. HR ${form.heart_rate}, SpO2 ${form.spo2}%`,
-        }),
-      });
-    } else {
-      setMessage('Could not update vitals right now.');
-    }
+  const push = async () => {
+    const res = await fetch('/api/vitals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+    setMsg(res.ok ? '✓ Pushed! Family dashboard updated via Realtime' : 'Push failed');
   };
 
-  return (
-    <div className="mx-auto max-w-2xl panel p-6">
-      <h1 className="text-xl font-semibold">Admin Demo Panel</h1>
-      <p className="mt-2 text-sm text-soft">Use this to simulate bedside updates for pilot demo.</p>
-      <form onSubmit={update} className="mt-6 grid grid-cols-2 gap-3">
-        <label className="text-sm">HR
-          <input type="number" className="mt-1 w-full rounded-lg border border-white/20 bg-navy px-3 py-2" value={form.heart_rate} onChange={(e) => setForm({ ...form, heart_rate: Number(e.target.value) })} />
-        </label>
-        <label className="text-sm">SpO2
-          <input type="number" className="mt-1 w-full rounded-lg border border-white/20 bg-navy px-3 py-2" value={form.spo2} onChange={(e) => setForm({ ...form, spo2: Number(e.target.value) })} />
-        </label>
-        <label className="text-sm">BP
-          <input className="mt-1 w-full rounded-lg border border-white/20 bg-navy px-3 py-2" value={form.bp} onChange={(e) => setForm({ ...form, bp: e.target.value })} />
-        </label>
-        <label className="text-sm">Temperature
-          <input type="number" step="0.1" className="mt-1 w-full rounded-lg border border-white/20 bg-navy px-3 py-2" value={form.temp} onChange={(e) => setForm({ ...form, temp: Number(e.target.value) })} />
-        </label>
-        <label className="col-span-2 text-sm">Status
-          <select className="mt-1 w-full rounded-lg border border-white/20 bg-navy px-3 py-2" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-            <option>Stable</option>
-            <option>Warning</option>
-            <option>Critical</option>
-          </select>
-        </label>
-        <button className="col-span-2 rounded-xl bg-teal px-4 py-3 font-medium text-navy" type="submit">Push Live Update</button>
-      </form>
-      {message && <p className="mt-3 text-sm text-soft">{message}</p>}
-    </div>
-  );
+  return <div className='mx-auto max-w-lg space-y-3 bg-[#0A1628] pb-8 text-white'>
+    <Link href='/dashboard' className='text-cyan-400'>← Back</Link>
+    <div className='rounded-xl bg-cyan-500/20 p-2 text-sm text-cyan-200'>Changes push to Supabase and update family dashboard in real time</div>
+    {[
+      ['heart_rate', 'Heart Rate', 40, 150, 1], ['spo2', 'SpO2', 80, 100, 1], ['bp_systolic', 'BP Systolic', 80, 200, 1], ['bp_diastolic', 'BP Diastolic', 50, 130, 1], ['temperature', 'Temperature', 95, 105, 0.1], ['resp_rate', 'Resp Rate', 8, 35, 1],
+    ].map(([key, label, min, max, step]) => <div key={String(key)} className='rounded-xl bg-[#0F2033] p-3'><p>{label}: {String((form as Record<string, number | string>)[String(key)])}</p><input type='range' min={Number(min)} max={Number(max)} step={Number(step)} value={Number((form as Record<string, number | string>)[String(key)])} onChange={(e) => setForm({ ...form, [key]: Number(e.target.value) })} className='w-full' /></div>)}
+    <div className='grid grid-cols-3 gap-2'>{['stable', 'warning', 'critical'].map((s) => <button key={s} onClick={() => setForm({ ...form, status: s })} className={`rounded-xl p-2 ${form.status === s ? 'bg-cyan-400 text-black' : 'bg-[#0F2033]'}`}>{s}</button>)}</div>
+    <button onClick={() => void push()} className='w-full rounded-xl bg-cyan-400 p-3 font-semibold text-black'>Push to Family Dashboard</button>
+    {msg && <p className='text-sm text-cyan-300'>{msg}</p>}
+  </div>;
 }
