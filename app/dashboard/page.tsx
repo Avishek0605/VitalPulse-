@@ -5,7 +5,7 @@ import { TopBar } from '@/components/layout/TopBar';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseClient } from '@/lib/supabase/client';
 import { Alert, Patient, getVitalStatus, statusColor, statusBg, timeAgo } from '@/types/database';
 
 export default function DashboardPage() {
@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const load = async () => {
     setLoading(true);
     setError('');
+    const supabase = getSupabaseClient();
     const [pRes, aRes] = await Promise.all([
       supabase.from('patients').select('*').eq('id', 'VP-2024-001').single(),
       supabase.from('alerts').select('*').eq('patient_id', 'VP-2024-001').order('timestamp', { ascending: false }).limit(5),
@@ -34,6 +35,8 @@ export default function DashboardPage() {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage.getItem('vp_auth') !== 'true') router.replace('/login');
     void load();
+
+    const supabase = getSupabaseClient();
 
     const patientChannel = supabase.channel('patient-realtime').on(
       'postgres_changes',
