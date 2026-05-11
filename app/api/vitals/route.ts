@@ -3,16 +3,22 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
+  );
+}
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = getSupabase();
     const body = await req.json();
-    const { patient_id = 'VP-2024-001', heart_rate, spo2,
-      bp_systolic, bp_diastolic, temperature, resp_rate, status } = body;
+    const {
+      patient_id = 'VP-2024-001',
+      heart_rate, spo2, bp_systolic,
+      bp_diastolic, temperature, resp_rate, status
+    } = body;
 
     const updates: Record<string, unknown> = {
       updated_at: new Date().toISOString()
@@ -27,8 +33,11 @@ export async function POST(req: NextRequest) {
     if (status       !== undefined) updates.status       = status;
 
     const { data, error } = await supabase
-      .from('patients').update(updates)
-      .eq('id', patient_id).select().single();
+      .from('patients')
+      .update(updates)
+      .eq('id', patient_id)
+      .select()
+      .single();
 
     if (error) throw error;
 
@@ -50,14 +59,24 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, patient: data });
-  } catch {
+  } catch (err) {
+    console.error(err);
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }
 }
 
 export async function GET() {
-  const { data, error } = await supabase
-    .from('patients').select('*').eq('id', 'VP-2024-001').single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('patients')
+      .select('*')
+      .eq('id', 'VP-2024-001')
+      .single();
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Fetch failed' }, { status: 500 });
+  }
 }
