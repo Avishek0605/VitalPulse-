@@ -1,10 +1,20 @@
-import { createClient } from '@supabase/supabase-js';
+'use client';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
+let client: SupabaseClient | null = null;
 
-export const supabase = createClient(url, key, {
-  realtime: {
-    params: { eventsPerSecond: 10 },
+export function getSupabaseClient(): SupabaseClient {
+  if (client) return client;
+  client = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder',
+    { realtime: { params: { eventsPerSecond: 10 } } }
+  );
+  return client;
+}
+
+export const supabase = {
+  get instance() {
+    return getSupabaseClient();
   },
-});
+};
